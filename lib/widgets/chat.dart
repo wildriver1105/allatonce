@@ -145,7 +145,7 @@ class _ChatWidgetState extends State<ChatWidget> {
 
         <critical>
         답변을 할 때는 어떠한 주석과 출처도 달지 말고 그냥 답변을 해.
-        마크다운도 절대 금지.
+        마크다운 절대 쓰지마.
         </critical>
       """
     }
@@ -406,9 +406,11 @@ class _ChatWidgetState extends State<ChatWidget> {
                 alignment:
                     isUser ? Alignment.centerRight : Alignment.centerLeft,
                 child: Container(
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 4.0,
-                    horizontal: 8.0,
+                  margin: EdgeInsets.only(
+                    top: 10.0,
+                    bottom: 10.0,
+                    left: isUser ? 80.0 : 10.0,
+                    right: isUser ? 10.0 : 80.0,
                   ),
                   padding: const EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
