@@ -3,6 +3,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
+import '../constants/colors.dart';
 
 class ChatWidget extends StatefulWidget {
   const ChatWidget({super.key});
@@ -414,9 +415,7 @@ class _ChatWidgetState extends State<ChatWidget> {
                   ),
                   padding: const EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
-                    color: isUser
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.secondary,
+                    color: isUser ? AppColors.primary : Colors.grey[200],
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Column(
@@ -425,8 +424,8 @@ class _ChatWidgetState extends State<ChatWidget> {
                     children: [
                       Text(
                         message,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: isUser ? Colors.white : Colors.black,
                         ),
                       ),
                       if (!isComplete) ...[

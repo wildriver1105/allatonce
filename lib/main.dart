@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'screens/chat.dart';
+import 'screens/main_screen.dart';
+import 'constants/colors.dart';
 
-Future<void> main() async {
-  // Ensure Flutter is initialized
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Load .env file
-  await dotenv.load(fileName: ".env");
-
+void main() async {
+  await dotenv.load();
   runApp(const MyApp());
 }
 
@@ -18,12 +14,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chat App',
+      title: 'AI Marine Care',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primaryColor: AppColors.primary,
+        scaffoldBackgroundColor: AppColors.background,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          background: AppColors.background,
+        ),
       ),
-      home: const ChatScreen(),
+      home: const MainScreen(),
     );
   }
 }
