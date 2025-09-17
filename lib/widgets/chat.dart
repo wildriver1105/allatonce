@@ -15,6 +15,28 @@ class _ChatWidgetState extends State<ChatWidget> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<String> _messages = [];
+  final List<bool> _isUserMessages = [];
+  final List<bool> _isCompleteMessages = [];
+  String _currentStreamingMessage = '';
+  bool _isStreaming = false;
+
+  void _addMessage(String content, bool isUser, bool isComplete) {
+    setState(() {
+      _messages.add(content);
+      _isUserMessages.add(isUser);
+      _isCompleteMessages.add(isComplete);
+    });
+  }
+
+  void _updateLastMessage(String content, bool isComplete) {
+    if (_messages.isNotEmpty) {
+      setState(() {
+        _messages[_messages.length - 1] = content;
+        _isCompleteMessages[_isCompleteMessages.length - 1] = isComplete;
+      });
+    }
+  }
+
   final List<Map<String, String>> _messageHistory = [
     {
       "role": "system",
@@ -120,11 +142,16 @@ class _ChatWidgetState extends State<ChatWidget> {
         - 동급 경쟁 모델 비교
         - 가격대비 성능 분석
         - 시장에서의 평판
+
+        <critical>
+        답변을 할 때는 어떠한 주석과 출처도 달지 말고 그냥 답변을 해.
+        마크다운도 절대 금지.
+        </critical>
       """
     }
   ];
 
-  Future<String?> sendMessageToXAI(String message) async {
+  Stream<String> sendMessageToXAI(String message) async* {
     final url = Uri.parse('https://api.x.ai/v1/chat/completions');
     final headers = {
       'Content-Type': 'application/json; charset=utf-8',
@@ -134,9 +161,11 @@ class _ChatWidgetState extends State<ChatWidget> {
     // 사용자 메시지를 히스토리에 추가
     _messageHistory.add({"role": "user", "content": message});
 
-    final body =
-        jsonEncode({"messages": _messageHistory, "model": "grok-2-latest"},
-            toEncodable: (dynamic item) {
+    final body = jsonEncode({
+      "messages": _messageHistory,
+      "model": "grok-2-latest",
+      "stream": true,
+    }, toEncodable: (dynamic item) {
       if (item is String) {
         return utf8.decode(utf8.encode(item));
       }
@@ -144,29 +173,47 @@ class _ChatWidgetState extends State<ChatWidget> {
     });
 
     try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      );
+      final request = http.Request('POST', url);
+      request.headers.addAll(headers);
+      request.body = body;
+
+      final response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(utf8.decode(response.bodyBytes));
-        final aiResponse = responseData['choices'][0]['message']['content'];
+        String accumulatedContent = '';
+
+        await for (final chunk in response.stream
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())) {
+          if (chunk.startsWith('data: ')) {
+            final data = chunk.substring(6);
+            if (data == '[DONE]') break;
+
+            try {
+              final jsonData = jsonDecode(data);
+              final content = jsonData['choices'][0]['delta']['content'] ?? '';
+              accumulatedContent += content;
+              yield content;
+            } catch (e) {
+              print('Error parsing chunk: $e');
+            }
+          }
+        }
+
         // AI 응답을 히스토리에 추가
-        _messageHistory.add({"role": "assistant", "content": aiResponse});
-        return aiResponse;
+        _messageHistory
+            .add({"role": "assistant", "content": accumulatedContent});
       } else {
         print('Error: ${response.statusCode}');
-        return null;
+        yield* Stream.empty();
       }
     } catch (e) {
       print('Exception: $e');
-      return null;
+      yield* Stream.empty();
     }
   }
 
-  Future<String?> sendMessageToOpenAI(String message) async {
+  Stream<String> sendMessageToOpenAI(String message) async* {
     final url = Uri.parse('https://api.openai.com/v1/chat/completions');
     final headers = {
       'Content-Type': 'application/json; charset=utf-8',
@@ -176,8 +223,11 @@ class _ChatWidgetState extends State<ChatWidget> {
     // 사용자 메시지를 히스토리에 추가
     _messageHistory.add({"role": "user", "content": message});
 
-    final body = jsonEncode({"messages": _messageHistory, "model": "gpt-4.1"},
-        toEncodable: (dynamic item) {
+    final body = jsonEncode({
+      "messages": _messageHistory,
+      "model": "gpt-4.1",
+      "stream": true,
+    }, toEncodable: (dynamic item) {
       if (item is String) {
         return utf8.decode(utf8.encode(item));
       }
@@ -185,32 +235,47 @@ class _ChatWidgetState extends State<ChatWidget> {
     });
 
     try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      );
+      final request = http.Request('POST', url);
+      request.headers.addAll(headers);
+      request.body = body;
+
+      final response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(utf8.decode(response.bodyBytes));
-        final aiResponse = responseData['choices'][0]['message']['content'];
+        String accumulatedContent = '';
 
-        print(responseData);
+        await for (final chunk in response.stream
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())) {
+          if (chunk.startsWith('data: ')) {
+            final data = chunk.substring(6);
+            if (data == '[DONE]') break;
+
+            try {
+              final jsonData = jsonDecode(data);
+              final content = jsonData['choices'][0]['delta']['content'] ?? '';
+              accumulatedContent += content;
+              yield content;
+            } catch (e) {
+              print('Error parsing chunk: $e');
+            }
+          }
+        }
 
         // AI 응답을 히스토리에 추가
-        _messageHistory.add({"role": "assistant", "content": aiResponse});
-        return aiResponse;
+        _messageHistory
+            .add({"role": "assistant", "content": accumulatedContent});
       } else {
         print('Error: ${response.statusCode}');
-        return null;
+        yield* Stream.empty();
       }
     } catch (e) {
       print('Exception: $e');
-      return null;
+      yield* Stream.empty();
     }
   }
 
-  Future<String?> sendMessageToPerplexity(String message) async {
+  Stream<String> sendMessageToPerplexity(String message) async* {
     final url = Uri.parse('https://api.perplexity.ai/chat/completions');
     final headers = {
       'Content-Type': 'application/json; charset=utf-8',
@@ -223,6 +288,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     final body = jsonEncode({
       "messages": _messageHistory,
       "model": "sonar-pro",
+      "stream": true,
     }, toEncodable: (dynamic item) {
       if (item is String) {
         return utf8.decode(utf8.encode(item));
@@ -231,58 +297,90 @@ class _ChatWidgetState extends State<ChatWidget> {
     });
 
     try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      );
+      final request = http.Request('POST', url);
+      request.headers.addAll(headers);
+      request.body = body;
+
+      final response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(utf8.decode(response.bodyBytes));
-        final aiResponse = responseData['choices'][0]['message']['content'];
+        String accumulatedContent = '';
 
-        print(responseData);
+        await for (final chunk in response.stream
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())) {
+          if (chunk.startsWith('data: ')) {
+            final data = chunk.substring(6);
+            if (data == '[DONE]') break;
+
+            try {
+              final jsonData = jsonDecode(data);
+              final content = jsonData['choices'][0]['delta']['content'] ?? '';
+              accumulatedContent += content;
+              yield content;
+            } catch (e) {
+              print('Error parsing chunk: $e');
+            }
+          }
+        }
 
         // AI 응답을 히스토리에 추가
-        _messageHistory.add({"role": "assistant", "content": aiResponse});
-        return aiResponse;
+        _messageHistory
+            .add({"role": "assistant", "content": accumulatedContent});
       } else {
         print('Error: ${response.statusCode}');
-        return null;
+        yield* Stream.empty();
       }
     } catch (e) {
       print('Exception: $e');
-      return null;
+      yield* Stream.empty();
     }
   }
 
   void _handleSendMessage() async {
     if (_messageController.text.isNotEmpty) {
       final message = _messageController.text;
-      setState(() {
-        _messages.add(message);
-        _messageController.clear();
-      });
+      _messageController.clear();
 
-      // AI 응답 받기
-      final aiResponse = await sendMessageToOpenAI(message);
-      if (aiResponse != null) {
-        setState(() {
-          _messages.add(aiResponse);
-        });
-      }
+      // 사용자 메시지 추가
+      _addMessage(message, true, true);
+
+      // AI 응답 준비
+      setState(() {
+        _isStreaming = true;
+        _currentStreamingMessage = '';
+      });
+      _addMessage('', false, false);
 
       // 스크롤을 맨 아래로 이동
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
+      _scrollToBottom();
+
+      // AI 응답 스트리밍 시작
+      await for (final chunk in sendMessageToPerplexity(message)) {
+        _currentStreamingMessage += chunk;
+        _updateLastMessage(_currentStreamingMessage, false);
+        _scrollToBottom();
+      }
+
+      // 스트리밍 완료
+      setState(() {
+        _isStreaming = false;
       });
+      _updateLastMessage(_currentStreamingMessage, true);
+      _scrollToBottom();
     }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -294,12 +392,19 @@ class _ChatWidgetState extends State<ChatWidget> {
             controller: _scrollController,
             itemCount: _messages.length,
             itemBuilder: (context, index) {
-              final isUserMessage = index % 2 == 0; // 짝수 인덱스는 사용자 메시지
+              if (index >= _messages.length ||
+                  index >= _isUserMessages.length ||
+                  index >= _isCompleteMessages.length) {
+                return const SizedBox.shrink();
+              }
+
+              final message = _messages[index];
+              final isUser = _isUserMessages[index];
+              final isComplete = _isCompleteMessages[index];
 
               return Align(
-                alignment: isUserMessage
-                    ? Alignment.centerRight
-                    : Alignment.centerLeft,
+                alignment:
+                    isUser ? Alignment.centerRight : Alignment.centerLeft,
                 child: Container(
                   margin: const EdgeInsets.symmetric(
                     vertical: 4.0,
@@ -307,16 +412,34 @@ class _ChatWidgetState extends State<ChatWidget> {
                   ),
                   padding: const EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
-                    color: isUserMessage
+                    color: isUser
                         ? Theme.of(context).colorScheme.primary
                         : Theme.of(context).colorScheme.secondary,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  child: Text(
-                    _messages[index],
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        message,
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      if (!isComplete) ...[
+                        const SizedBox(height: 8),
+                        const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               );
