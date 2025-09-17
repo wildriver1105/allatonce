@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
-import 'chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final void Function(int) setScreen;
+  final void Function(String) onModelSelected;
+
+  const HomeScreen({
+    super.key,
+    required this.setScreen,
+    required this.onModelSelected,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -89,13 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: _selectedModel == null
                     ? null
                     : () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ChatScreen(modelName: _selectedModel!),
-                          ),
-                        );
+                        widget.onModelSelected(_selectedModel!);
+                        widget.setScreen(1);
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

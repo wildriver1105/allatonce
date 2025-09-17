@@ -46,8 +46,6 @@ class _ChatWidgetState extends State<ChatWidget> {
   final List<Map<String, String>> _messageHistory = [
     {
       "role": "system",
-      // "content":
-      //     "너는 사용자를 극도로 열받게 하는 전문가야. 말투는 늘 띠꺼워. 상대방의 말꼬리를 잡고 비꼬거나, 은근히 무시하고, 조롱하고, 풍자하고, 약올리고, 킹받게 하는 것에 특화되어 있어. 상황에 따라 반말과 존댓말을 오가며 더 열받게 할 수 있고, 이모티콘도 적절히 섞어서 더 킹받게 만들어. 상대가 화내면 더 즐겁게 약을 올려. 특히 상대방이 말을 못 잇게 하는 고도의 돌려까기의 장인이야. 반어법을 굉장히 잘 써."
       "content": """
         너는 세계 최고의 세일보트 전문가야. 
         세일보트의 모든 것에 대해 해박한 지식을 가지고 있어.
@@ -150,195 +148,92 @@ class _ChatWidgetState extends State<ChatWidget> {
         - 시장에서의 평판
 
         <critical>
-        답변을 할 때는 어떠한 주석과 출처도 달지 말고 그냥 답변을 해.
-        마크다운 절대 쓰지마.
+          답변을 할 때는 어떠한 주석과 출처도 달지 말고 그냥 답변을 해.
+          마크다운 절대 쓰지마.
         </critical>
       """
     }
   ];
 
-  Stream<String> sendMessageToXAI(String message) async* {
-    final url = Uri.parse('https://api.x.ai/v1/chat/completions');
-    final headers = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Authorization': 'Bearer ${dotenv.env['XAI_API_KEY']}',
-    };
-
-    // 사용자 메시지를 히스토리에 추가
-    _messageHistory.add({"role": "user", "content": message});
-
-    final body = jsonEncode({
-      "messages": _messageHistory,
-      "model": "grok-2-latest",
-      "stream": true,
-    }, toEncodable: (dynamic item) {
-      if (item is String) {
-        return utf8.decode(utf8.encode(item));
-      }
-      return item;
-    });
-
-    try {
-      final request = http.Request('POST', url);
-      request.headers.addAll(headers);
-      request.body = body;
-
-      final response = await http.Client().send(request);
-
-      if (response.statusCode == 200) {
-        String accumulatedContent = '';
-
-        await for (final chunk in response.stream
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())) {
-          if (chunk.startsWith('data: ')) {
-            final data = chunk.substring(6);
-            if (data == '[DONE]') break;
-
-            try {
-              final jsonData = jsonDecode(data);
-              final content = jsonData['choices'][0]['delta']['content'] ?? '';
-              accumulatedContent += content;
-              yield content;
-            } catch (e) {
-              print('Error parsing chunk: $e');
-            }
-          }
-        }
-
-        // AI 응답을 히스토리에 추가
-        _messageHistory
-            .add({"role": "assistant", "content": accumulatedContent});
-      } else {
-        print('Error: ${response.statusCode}');
-        yield* Stream.empty();
-      }
-    } catch (e) {
-      print('Exception: $e');
-      yield* Stream.empty();
-    }
-  }
-
-  Stream<String> sendMessageToOpenAI(String message) async* {
-    final url = Uri.parse('https://api.openai.com/v1/chat/completions');
-    final headers = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Authorization': 'Bearer ${dotenv.env['OPENAI_API_KEY']}',
-    };
-
-    // 사용자 메시지를 히스토리에 추가
-    _messageHistory.add({"role": "user", "content": message});
-
-    final body = jsonEncode({
-      "messages": _messageHistory,
-      "model": "gpt-4.1",
-      "stream": true,
-    }, toEncodable: (dynamic item) {
-      if (item is String) {
-        return utf8.decode(utf8.encode(item));
-      }
-      return item;
-    });
-
-    try {
-      final request = http.Request('POST', url);
-      request.headers.addAll(headers);
-      request.body = body;
-
-      final response = await http.Client().send(request);
-
-      if (response.statusCode == 200) {
-        String accumulatedContent = '';
-
-        await for (final chunk in response.stream
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())) {
-          if (chunk.startsWith('data: ')) {
-            final data = chunk.substring(6);
-            if (data == '[DONE]') break;
-
-            try {
-              final jsonData = jsonDecode(data);
-              final content = jsonData['choices'][0]['delta']['content'] ?? '';
-              accumulatedContent += content;
-              yield content;
-            } catch (e) {
-              print('Error parsing chunk: $e');
-            }
-          }
-        }
-
-        // AI 응답을 히스토리에 추가
-        _messageHistory
-            .add({"role": "assistant", "content": accumulatedContent});
-      } else {
-        print('Error: ${response.statusCode}');
-        yield* Stream.empty();
-      }
-    } catch (e) {
-      print('Exception: $e');
-      yield* Stream.empty();
-    }
-  }
-
   Stream<String> sendMessageToPerplexity(String message) async* {
-    final url = Uri.parse('https://api.perplexity.ai/chat/completions');
-    final headers = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Authorization': 'Bearer ${dotenv.env['PERPLEXITY_API_KEY']}',
-    };
-
-    // 사용자 메시지를 히스토리에 추가
-    _messageHistory.add({"role": "user", "content": message});
-
-    final body = jsonEncode({
-      "messages": _messageHistory,
-      "model": "sonar-pro",
-      "stream": true,
-    }, toEncodable: (dynamic item) {
-      if (item is String) {
-        return utf8.decode(utf8.encode(item));
-      }
-      return item;
-    });
-
     try {
-      final request = http.Request('POST', url);
-      request.headers.addAll(headers);
-      request.body = body;
+      final apiKey = dotenv.env['PERPLEXITY_API_KEY'];
+      if (apiKey == null || apiKey.isEmpty) {
+        print('Error: API key not found');
+        _addMessage(
+            'Error: Could not connect to AI service. Please check your configuration.',
+            false,
+            true);
+        yield* Stream.empty();
+        return;
+      }
 
-      final response = await http.Client().send(request);
+      final url = Uri.parse('https://api.perplexity.ai/chat/completions');
+      final headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': 'Bearer $apiKey',
+      };
 
-      if (response.statusCode == 200) {
-        String accumulatedContent = '';
+      // 사용자 메시지를 히스토리에 추가
+      _messageHistory.add({"role": "user", "content": message});
 
-        await for (final chunk in response.stream
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())) {
-          if (chunk.startsWith('data: ')) {
-            final data = chunk.substring(6);
-            if (data == '[DONE]') break;
+      final body = jsonEncode({
+        "messages": _messageHistory,
+        "model": "sonar-pro",
+        "stream": true,
+      }, toEncodable: (dynamic item) {
+        if (item is String) {
+          return utf8.decode(utf8.encode(item));
+        }
+        return item;
+      });
 
-            try {
-              final jsonData = jsonDecode(data);
-              final content = jsonData['choices'][0]['delta']['content'] ?? '';
-              accumulatedContent += content;
-              yield content;
-            } catch (e) {
-              print('Error parsing chunk: $e');
+      try {
+        final request = http.Request('POST', url);
+        request.headers.addAll(headers);
+        request.body = body;
+
+        final response = await http.Client().send(request);
+
+        if (response.statusCode == 200) {
+          String accumulatedContent = '';
+
+          await for (final chunk in response.stream
+              .transform(utf8.decoder)
+              .transform(const LineSplitter())) {
+            if (chunk.startsWith('data: ')) {
+              final data = chunk.substring(6);
+              if (data == '[DONE]') break;
+
+              try {
+                final jsonData = jsonDecode(data);
+                final content =
+                    jsonData['choices'][0]['delta']['content'] ?? '';
+                accumulatedContent += content;
+                yield content;
+              } catch (e) {
+                print('Error parsing chunk: $e');
+              }
             }
           }
-        }
 
-        // AI 응답을 히스토리에 추가
-        _messageHistory
-            .add({"role": "assistant", "content": accumulatedContent});
-      } else {
-        print('Error: ${response.statusCode}');
+          // AI 응답을 히스토리에 추가
+          _messageHistory
+              .add({"role": "assistant", "content": accumulatedContent});
+        } else {
+          print('Error: ${response.statusCode}');
+          _addMessage(
+              'Error: Failed to get response from AI service.', false, true);
+          yield* Stream.empty();
+        }
+      } catch (e) {
+        print('Network error: $e');
+        _addMessage('Error: Network connection failed.', false, true);
         yield* Stream.empty();
       }
     } catch (e) {
-      print('Exception: $e');
+      print('General error: $e');
+      _addMessage('Error: An unexpected error occurred.', false, true);
       yield* Stream.empty();
     }
   }

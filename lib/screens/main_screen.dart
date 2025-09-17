@@ -12,24 +12,38 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  int selectedIndex = 0;
+  String selectedModel = '';
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const ChatScreen(modelName: ''),
-    const SettingsScreen(),
-  ];
+  void setSelectedIndex(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
+  void setSelectedModel(String model) {
+    setState(() {
+      selectedModel = model;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> screens = [
+      HomeScreen(
+        setScreen: setSelectedIndex,
+        onModelSelected: setSelectedModel,
+      ),
+      ChatScreen(modelName: selectedModel),
+      const SettingsScreen(),
+    ];
+
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: screens[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
+        currentIndex: selectedIndex,
         onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+          setSelectedIndex(index);
         },
         selectedItemColor: AppColors.primary,
         items: const [
