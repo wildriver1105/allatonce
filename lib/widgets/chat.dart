@@ -124,7 +124,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     }
   ];
 
-  Future<String?> sendMessageToAI(String message) async {
+  Future<String?> sendMessageToXAI(String message) async {
     final url = Uri.parse('https://api.x.ai/v1/chat/completions');
     final headers = {
       'Content-Type': 'application/json; charset=utf-8',
@@ -178,6 +178,52 @@ class _ChatWidgetState extends State<ChatWidget> {
 
     final body = jsonEncode({"messages": _messageHistory, "model": "gpt-4.1"},
         toEncodable: (dynamic item) {
+      if (item is String) {
+        return utf8.decode(utf8.encode(item));
+      }
+      return item;
+    });
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+        final aiResponse = responseData['choices'][0]['message']['content'];
+
+        print(responseData);
+
+        // AI 응답을 히스토리에 추가
+        _messageHistory.add({"role": "assistant", "content": aiResponse});
+        return aiResponse;
+      } else {
+        print('Error: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  Future<String?> sendMessageToPerplexity(String message) async {
+    final url = Uri.parse('https://api.perplexity.ai/chat/completions');
+    final headers = {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Authorization': 'Bearer ${dotenv.env['PERPLEXITY_API_KEY']}',
+    };
+
+    // 사용자 메시지를 히스토리에 추가
+    _messageHistory.add({"role": "user", "content": message});
+
+    final body = jsonEncode({
+      "messages": _messageHistory,
+      "model": "sonar-pro",
+    }, toEncodable: (dynamic item) {
       if (item is String) {
         return utf8.decode(utf8.encode(item));
       }
