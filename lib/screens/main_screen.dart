@@ -16,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const ChatScreen(),
+    const ChatScreen(modelName: ''),
     const SettingsScreen(),
   ];
 

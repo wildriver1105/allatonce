@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import 'chat_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String? _selectedModel;
 
   @override
   Widget build(BuildContext context) {
@@ -56,33 +63,40 @@ class HomeScreen extends StatelessWidget {
                   underline: Container(),
                   items: const [
                     DropdownMenuItem(
-                      value: 'model_x',
-                      child: Text('Yacht Model X'),
+                      value: 'fareast28',
+                      child: Text('FarEast 28'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'farr40',
+                      child: Text('Farr 40'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'benetaur473',
+                      child: Text('Benetaur 473'),
                     ),
                   ],
-                  onChanged: (value) {
-                    if (value != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChatScreen(),
-                        ),
-                      );
-                    }
+                  value: _selectedModel,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _selectedModel = value;
+                    });
                   },
                 ),
               ),
               const Spacer(),
               // Continue Button
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ChatScreen(),
-                    ),
-                  );
-                },
+                onPressed: _selectedModel == null
+                    ? null
+                    : () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ChatScreen(modelName: _selectedModel!),
+                          ),
+                        );
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),

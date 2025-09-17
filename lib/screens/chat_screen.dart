@@ -1,27 +1,46 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import '../widgets/chat.dart';
+import 'home_screen.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+  final String modelName;
+
+  const ChatScreen({
+    super.key,
+    this.modelName = '',
+  });
+
+  String _getDisplayName(String modelId) {
+    switch (modelId) {
+      case 'fareast28':
+        return 'FarEast28';
+      case 'farr40':
+        return 'Farr40';
+      case 'benetau473':
+        return 'Benetaur473';
+      default:
+        return modelId;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.sailing, size: 24),
-            SizedBox(width: 8),
-            Text('Yacht Model X'),
+            const Icon(Icons.sailing, size: 24),
+            const SizedBox(width: 8),
+            Text(_getDisplayName(modelName)),
           ],
         ),
         backgroundColor: AppColors.background,
         foregroundColor: Colors.black,
         elevation: 0,
       ),
-      body: const ChatWidget(),
+      body: ChatWidget(modelName: modelName),
     );
   }
 }

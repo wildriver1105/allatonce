@@ -6,7 +6,12 @@ import 'dart:convert';
 import '../constants/colors.dart';
 
 class ChatWidget extends StatefulWidget {
-  const ChatWidget({super.key});
+  final String modelName;
+
+  const ChatWidget({
+    super.key,
+    this.modelName = '',
+  });
 
   @override
   State<ChatWidget> createState() => _ChatWidgetState();
