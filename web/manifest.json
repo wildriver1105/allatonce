@@ -1,6 +1,6 @@
 {
-    "name": "kingchat",
-    "short_name": "kingchat",
+    "name": "allatonce",
+    "short_name": "allatonce",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
