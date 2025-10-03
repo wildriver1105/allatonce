@@ -34,7 +34,6 @@ class ManualService {
   static Future<ManualFolder?> createFolder(
       String name, Color color, String? description) async {
     try {
-      final prefs = await ManualService.prefs;
       final folders = await getAllFolders();
 
       final newFolder = ManualFolder(
@@ -168,7 +167,7 @@ class ManualService {
         createdAt: DateTime.now(),
         folderId: folderId,
         category: _getCategoryFromExtension(fileName.split('.').last),
-        fileSize: await file.length(),
+        fileSize: (await file.length()).toDouble(),
       );
 
       final manuals = await getAllManuals();

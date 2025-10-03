@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import '../widgets/chat.dart';
-import 'home_screen.dart';
 
 class ChatScreen extends StatelessWidget {
   final String modelName;

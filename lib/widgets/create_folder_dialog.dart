@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/manual_service.dart';
+import '../models/manual_folder.dart';
 
 class CreateFolderDialog extends StatefulWidget {
   final ManualFolder? folder;
@@ -13,7 +14,7 @@ class CreateFolderDialog extends StatefulWidget {
 class _CreateFolderDialogState extends State<CreateFolderDialog> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
-  Color _selectedColor;
+  late Color _selectedColor;
   final List<Color> _colorOptions = [
     Colors.blue,
     Colors.red,
@@ -169,4 +170,3 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
     }
   }
 }
-

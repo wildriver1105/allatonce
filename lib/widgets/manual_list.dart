@@ -194,7 +194,7 @@ class _ManualListWidgetState extends State<ManualListWidget> {
   }
 
   Future<void> _showManualOptions(Manual manual) async {
-    final result = await showModalBottomSheet(
+    await showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
