@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import 'home_screen.dart';
 import 'chat_screen.dart';
-import 'settings_screen.dart';
+// import 'settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -35,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
         onModelSelected: setSelectedModel,
       ),
       ChatScreen(modelName: selectedModel),
-      const SettingsScreen(),
+      // const SettingsScreen(),
     ];
 
     return Scaffold(
@@ -43,7 +43,10 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: (index) {
-          setSelectedIndex(index);
+          // Settings 탭이 비활성화되어 있으므로 인덱스 2는 무시
+          if (index < screens.length) {
+            setSelectedIndex(index);
+          }
         },
         selectedItemColor: AppColors.primary,
         items: const [
@@ -55,10 +58,10 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.chat),
             label: 'Chat',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.settings),
+          //   label: 'Settings',
+          // ),
         ],
       ),
     );

@@ -209,4 +209,3 @@ class _UploadManualDialogState extends State<UploadManualDialog> {
     }
   }
 }
-
