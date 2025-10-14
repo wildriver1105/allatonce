@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import '../constants/colors.dart';
 import '../constants/prompts.dart';
-import 'package:markdown_widget/markdown_widget.dart';
+import 'package:gpt_markdown/gpt_markdown.dart';
 
 class ChatWidget extends StatefulWidget {
   final String modelName;
@@ -244,8 +244,11 @@ class _ChatWidgetState extends State<ChatWidget> {
                           ),
                         )
                       else
-                        MarkdownWidget(
-                          data: message,
+                        GptMarkdown(
+                          message,
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
                         ),
                       if (!isComplete) ...[
                         const SizedBox(height: 8),
