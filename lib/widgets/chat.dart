@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import '../constants/colors.dart';
 import '../constants/prompts.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 
 class ChatWidget extends StatefulWidget {
   final String modelName;
@@ -235,12 +236,17 @@ class _ChatWidgetState extends State<ChatWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        message,
-                        style: TextStyle(
-                          color: isUser ? Colors.white : Colors.black,
+                      if (isUser)
+                        Text(
+                          message,
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        )
+                      else
+                        MarkdownWidget(
+                          data: message,
                         ),
-                      ),
                       if (!isComplete) ...[
                         const SizedBox(height: 8),
                         const SizedBox(
