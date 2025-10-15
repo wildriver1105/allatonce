@@ -64,7 +64,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     _messageHistory = [
       {
         "role": "system",
-        "content": ModelPrompts.getPromptEnglish(widget.modelName),
+        "content": ModelPrompts.getPrompt("en", widget.modelName),
       },
     ];
   }

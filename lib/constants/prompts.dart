@@ -1,5 +1,5 @@
 class ModelPrompts {
-  static const String basePrompt = """
+  static const String basePromptKorean = """
 너는 세계 최고의 세일보트 전문가야. 
 세일보트의 모든 것에 대해 해박한 지식을 가지고 있어.
 
@@ -127,22 +127,23 @@ Answer Format:
 - Use markdown tables when tables are needed
 """;
 
-  static String getPromptKorean(String? sailboatModel) {
-    String prompt = basePrompt;
+  static const Map<String, String> prompts = {
+    'ko': basePromptKorean,
+    'en': basePromptEnglish,
+  };
+
+  static const Map<String, String> modelMessages = {
+    'ko': '사용자가 알고 싶어하는 모델은',
+    'en': 'The sailboat model the user is interested in is',
+  };
+
+  static String getPrompt(String language, String? sailboatModel) {
+    String prompt = prompts[language] ?? prompts['ko']!;
 
     if (sailboatModel != null && sailboatModel.isNotEmpty) {
-      prompt += "\n\n사용자가 알고 싶어하는 모델은 $sailboatModel입니다.";
-    }
-
-    return prompt;
-  }
-
-  static String getPromptEnglish(String? sailboatModel) {
-    String prompt = basePromptEnglish;
-
-    if (sailboatModel != null && sailboatModel.isNotEmpty) {
+      String modelMessage = modelMessages[language] ?? modelMessages['ko']!;
       prompt +=
-          "\n\nThe sailboat model the user is interested in is $sailboatModel.";
+          "\n\n$modelMessage $sailboatModel${language == 'ko' ? '입니다.' : '.'}";
     }
 
     return prompt;
