@@ -127,7 +127,7 @@ Answer Format:
 - Use markdown tables when tables are needed
 """;
 
-  static String getPrompt(String? sailboatModel) {
+  static String getPromptKorean(String? sailboatModel) {
     String prompt = basePrompt;
 
     if (sailboatModel != null && sailboatModel.isNotEmpty) {
