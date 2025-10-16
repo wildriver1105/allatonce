@@ -22,6 +22,8 @@
 	<string>This app requires camera access to take and attach photos to manual documents.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app requires microphone access for video recording.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app accesses your photo library to attach images to manual documents.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
