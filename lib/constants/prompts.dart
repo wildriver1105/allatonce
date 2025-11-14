@@ -1,4 +1,57 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
+
 class ModelPrompts {
+  static List<Map<String, dynamic>>? _datasetCache;
+
+  static Future<List<Map<String, dynamic>>> _loadDataset() async {
+    if (_datasetCache != null) {
+      return _datasetCache!;
+    }
+
+    try {
+      final String jsonString = await rootBundle
+          .loadString('lib/constants/aimc_dataset_all_900.json');
+      final List<dynamic> jsonData = jsonDecode(jsonString);
+      _datasetCache = jsonData.cast<Map<String, dynamic>>();
+      return _datasetCache!;
+    } catch (e) {
+      print('Error loading dataset: $e');
+      return [];
+    }
+  }
+
+  static String _formatDatasetForPrompt(
+      List<Map<String, dynamic>> dataset, String language) {
+    if (dataset.isEmpty) {
+      return '';
+    }
+
+    final String header = language == 'ko'
+        ? '\n\n## 참고 데이터셋\n\n다음은 세일보트 관련 질문과 답변 데이터셋입니다. 이 데이터를 참고하여 답변을 제공하세요:\n\n'
+        : '\n\n## Reference Dataset\n\nThe following is a dataset of sailboat-related questions and answers. Please refer to this data when providing answers:\n\n';
+
+    final StringBuffer buffer = StringBuffer(header);
+
+    // 데이터셋을 JSON 형식으로 포맷팅 (처음 50개만 포함하여 prompt 크기 제한)
+    final int maxItems = 50;
+    final List<Map<String, dynamic>> limitedDataset =
+        dataset.take(maxItems).toList();
+
+    buffer.write('```json\n');
+    buffer.write(jsonEncode(limitedDataset));
+    buffer.write('\n```\n');
+
+    if (dataset.length > maxItems) {
+      final String footer = language == 'ko'
+          ? '\n\n*참고: 전체 데이터셋에는 총 ${dataset.length}개의 항목이 있으며, 위에는 처음 $maxItems개만 표시되었습니다.*\n'
+          : '\n\n*Note: The full dataset contains ${dataset.length} items in total, with the first $maxItems shown above.*\n';
+      buffer.write(footer);
+    }
+
+    return buffer.toString();
+  }
+
   static const String basePromptKorean = """
 너는 세계 최고의 세일보트 전문가야. 
 세일보트의 모든 것에 대해 해박한 지식을 가지고 있어.
@@ -61,6 +114,11 @@ class ModelPrompts {
 - 중요한 내용은 **굵게** 표시해
 - 코드나 특정 값은 `백틱`으로 감싸
 - 표가 필요한 경우 마크다운 테이블을 사용해
+
+<crucial>
+  사용자의 질문이 데이터셋에 있는 내용이면, 그 것을 가장 먼저 찾아서 어드레스 후에 추가 정보를 작성하도록 해.
+  그리고 답변에 주석 넘버 등은 절대로 넣지마.
+</crucial>
 """;
 
   static const String basePromptEnglish = """
@@ -137,13 +195,24 @@ Answer Format:
     'en': 'The sailboat model the user is interested in is',
   };
 
-  static String getPrompt(String language, String? sailboatModel) {
+  static Future<String> getPrompt(
+    String language,
+    String? sailboatModel, {
+    bool includeDataset = true,
+  }) async {
     String prompt = prompts[language] ?? prompts['ko']!;
 
     if (sailboatModel != null && sailboatModel.isNotEmpty) {
       String modelMessage = modelMessages[language] ?? modelMessages['ko']!;
       prompt +=
           "\n\n$modelMessage $sailboatModel${language == 'ko' ? '입니다.' : '.'}";
+    }
+
+    // 데이터셋 포함
+    if (includeDataset) {
+      final dataset = await _loadDataset();
+      prompt +=
+          "\n\n데이터셋은 다음과 같아.\n\n${_formatDatasetForPrompt(dataset, language)}";
     }
 
     return prompt;
