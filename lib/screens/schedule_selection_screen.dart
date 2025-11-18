@@ -10,7 +10,8 @@ class ScheduleSelectionScreen extends StatefulWidget {
 }
 
 class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
-  DateTime _selectedDate = DateTime.now();
+  DateTime? _startDate;
+  DateTime? _endDate;
   DateTime _currentMonth = DateTime.now();
   bool _oneDayOnly = false;
   
@@ -105,6 +106,7 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
                             setState(() {
                               _oneDayOnly = value ?? false;
                               if (_oneDayOnly) {
+                                _endDate = _startDate;
                                 _endTime = _startTime;
                               }
                             });
@@ -118,10 +120,15 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
                     ),
                     const SizedBox(height: 24),
                     // 시작일 선택
-                    _buildDateTimeSelector(
+                    _buildDateSelector(
                       label: '시작일 선택',
+                      date: _startDate,
                       time: _startTime,
-                      onTap: () {
+                      isSelected: false,
+                      onDateTap: () {
+                        // 날짜는 캘린더에서 선택
+                      },
+                      onTimeTap: () {
                         setState(() {
                           _isSelectingStartTime = true;
                           _showTimePicker = true;
@@ -130,10 +137,15 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
                     ),
                     const SizedBox(height: 16),
                     // 끝나는 날 선택
-                    _buildDateTimeSelector(
+                    _buildDateSelector(
                       label: '끝나는 날 선택',
+                      date: _endDate,
                       time: _endTime,
-                      onTap: () {
+                      isSelected: false,
+                      onDateTap: () {
+                        // 날짜는 캘린더에서 선택
+                      },
+                      onTimeTap: () {
                         setState(() {
                           _isSelectingStartTime = false;
                           _showTimePicker = true;
@@ -162,19 +174,22 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
                 ],
               ),
               child: ElevatedButton(
-                onPressed: () {
-                  final displayText = _oneDayOnly
-                      ? '${_selectedDate.month}/${_selectedDate.day} ${_formatTime(_startTime)}'
-                      : '${_selectedDate.month}/${_selectedDate.day} ${_formatTime(_startTime)} - ${_formatTime(_endTime)}';
-                  
-                  Navigator.pop(context, {
-                    'display': displayText,
-                    'startDate': _selectedDate,
-                    'startTime': _startTime,
-                    'endTime': _endTime,
-                    'oneDayOnly': _oneDayOnly,
-                  });
-                },
+                onPressed: (_startDate != null && (_oneDayOnly || _endDate != null))
+                    ? () {
+                        final displayText = _oneDayOnly
+                            ? '${_startDate!.month}/${_startDate!.day} ${_formatTime(_startTime)}'
+                            : '${_startDate!.month}/${_startDate!.day} ${_formatTime(_startTime)} - ${_endDate!.month}/${_endDate!.day} ${_formatTime(_endTime)}';
+                        
+                        Navigator.pop(context, {
+                          'display': displayText,
+                          'startDate': _startDate,
+                          'endDate': _endDate ?? _startDate,
+                          'startTime': _startTime,
+                          'endTime': _endTime,
+                          'oneDayOnly': _oneDayOnly,
+                        });
+                      }
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -237,10 +252,24 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
     // 현재 달의 날들
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(_currentMonth.year, _currentMonth.month, day);
-      final isSelected = date.year == _selectedDate.year &&
-          date.month == _selectedDate.month &&
-          date.day == _selectedDate.day;
-      dayWidgets.add(_buildDayCell(day, isCurrentMonth: true, isSelected: isSelected));
+      final isStartDate = _startDate != null &&
+          date.year == _startDate!.year &&
+          date.month == _startDate!.month &&
+          date.day == _startDate!.day;
+      final isEndDate = _endDate != null &&
+          date.year == _endDate!.year &&
+          date.month == _endDate!.month &&
+          date.day == _endDate!.day;
+      final isInRange = _startDate != null && _endDate != null &&
+          !date.isBefore(_startDate!) && !date.isAfter(_endDate!) &&
+          !isStartDate && !isEndDate;
+      dayWidgets.add(_buildDayCell(
+        day,
+        isCurrentMonth: true,
+        isStartDate: isStartDate,
+        isEndDate: isEndDate,
+        isInRange: isInRange,
+      ));
     }
     
     // 다음 달의 첫 날들
@@ -263,17 +292,53 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
     );
   }
 
-  Widget _buildDayCell(int day, {required bool isCurrentMonth, bool isSelected = false}) {
+  Widget _buildDayCell(
+    int day, {
+    required bool isCurrentMonth,
+    bool isStartDate = false,
+    bool isEndDate = false,
+    bool isInRange = false,
+  }) {
+    final date = DateTime(_currentMonth.year, _currentMonth.month, day);
     final isToday = isCurrentMonth &&
         day == DateTime.now().day &&
         _currentMonth.month == DateTime.now().month &&
         _currentMonth.year == DateTime.now().year;
     
+    final isSelected = isStartDate || isEndDate;
+    
     return GestureDetector(
       onTap: isCurrentMonth
           ? () {
               setState(() {
-                _selectedDate = DateTime(_currentMonth.year, _currentMonth.month, day);
+                final selectedDate = DateTime(_currentMonth.year, _currentMonth.month, day);
+                
+                if (_oneDayOnly) {
+                  // 하루만 예약인 경우
+                  _startDate = selectedDate;
+                  _endDate = selectedDate;
+                } else {
+                  // 일반적인 날짜 범위 선택
+                  if (_startDate == null) {
+                    // 첫 번째 클릭: 시작일로 설정
+                    _startDate = selectedDate;
+                    _endDate = null;
+                  } else if (_endDate == null) {
+                    // 두 번째 클릭
+                    if (selectedDate.isAfter(_startDate!) || selectedDate.isAtSameMomentAs(_startDate!)) {
+                      // 시작일보다 뒤거나 같으면 끝날짜로 설정
+                      _endDate = selectedDate;
+                    } else {
+                      // 시작일보다 앞이면 새로운 시작일로 설정
+                      _startDate = selectedDate;
+                      _endDate = null;
+                    }
+                  } else {
+                    // 이미 범위가 선택된 경우: 새로운 시작일로 설정
+                    _startDate = selectedDate;
+                    _endDate = null;
+                  }
+                }
               });
             }
           : null,
@@ -281,12 +346,15 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
         height: 40,
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
+          shape: isSelected ? BoxShape.circle : BoxShape.rectangle,
+          borderRadius: isSelected ? null : BorderRadius.circular(0),
           color: isSelected
               ? AppColors.primary
-              : isToday
-                  ? AppColors.primary.withOpacity(0.1)
-                  : Colors.transparent,
+              : isInRange
+                  ? AppColors.primary.withOpacity(0.2)
+                  : isToday && !isSelected
+                      ? AppColors.primary.withOpacity(0.1)
+                      : Colors.transparent,
           border: isToday && !isSelected
               ? Border.all(color: AppColors.primary, width: 2)
               : null,
@@ -309,38 +377,84 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
     );
   }
 
-  Widget _buildDateTimeSelector({
+  Widget _buildDateSelector({
     required String label,
+    required DateTime? date,
     required TimeOfDay time,
-    required VoidCallback onTap,
+    required bool isSelected,
+    required VoidCallback onDateTap,
+    required VoidCallback onTimeTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(12),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isSelected ? AppColors.primary : Colors.grey[300]!,
+          width: isSelected ? 2 : 1,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? AppColors.primary : Colors.black87,
             ),
-            Text(
-              _formatTime(time),
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: onDateTap,
+                child: Row(
+                  children: [
+                    Text(
+                      date != null
+                          ? '${date.month}/${date.day}'
+                          : '날짜 선택',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: date != null ? Colors.black87 : Colors.grey[600],
+                        fontWeight: date != null ? FontWeight.w500 : FontWeight.normal,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 18,
+                      color: Colors.grey[600],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+              InkWell(
+                onTap: onTimeTap,
+                child: Row(
+                  children: [
+                    Text(
+                      _formatTime(time),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.access_time,
+                      size: 18,
+                      color: Colors.grey[600],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
