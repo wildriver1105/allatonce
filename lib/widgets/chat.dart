@@ -60,11 +60,12 @@ class _ChatWidgetState extends State<ChatWidget> {
     }
   }
 
-  void _initializeMessageHistory() {
+  Future<void> _initializeMessageHistory() async {
+    final prompt = await ModelPrompts.getPrompt("en", widget.modelName);
     _messageHistory = [
       {
         "role": "system",
-        "content": ModelPrompts.getPrompt("en", widget.modelName),
+        "content": prompt,
       },
     ];
   }
