@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
+import 'berth_reservation_screen.dart';
 
 class MarinaServiceScreen extends StatefulWidget {
   const MarinaServiceScreen({super.key});
@@ -37,7 +38,12 @@ class _MarinaServiceScreenState extends State<MarinaServiceScreen> {
                 title: '부두 예약',
                 description: '마리나 부두 예약 및 관리',
                 onTap: () {
-                  // 부두 예약 기능 구현
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BerthReservationScreen(),
+                    ),
+                  );
                 },
               ),
               const SizedBox(height: 16),
