@@ -4,7 +4,11 @@ import 'screens/main_screen.dart';
 import 'constants/colors.dart';
 
 void main() async {
-  await dotenv.load();
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    print('Warning: Could not load .env file: $e');
+  }
   runApp(const MyApp());
 }
 

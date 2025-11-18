@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import 'home_screen.dart';
 import 'chat_screen.dart';
+import 'marina_service_screen.dart';
 // import 'settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -35,6 +36,7 @@ class _MainScreenState extends State<MainScreen> {
         onModelSelected: setSelectedModel,
       ),
       ChatScreen(modelName: selectedModel),
+      const MarinaServiceScreen(),
       // const SettingsScreen(),
     ];
 
@@ -57,6 +59,10 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
             label: 'Chat',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dock),
+            label: '마리나',
           ),
           // BottomNavigationBarItem(
           //   icon: Icon(Icons.settings),
