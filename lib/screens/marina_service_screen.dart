@@ -91,6 +91,24 @@ class _MarinaServiceScreenState extends State<MarinaServiceScreen> {
                   // 수리 서비스 기능 구현
                 },
               ),
+              const SizedBox(height: 16),
+              _buildServiceCard(
+                icon: Icons.people,
+                title: '세일러 매칭',
+                description: '함께 항해할 세일러 찾기',
+                onTap: () {
+                  // 세일러 매칭 기능 구현
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildServiceCard(
+                icon: Icons.school,
+                title: '교육 찾는 서비스',
+                description: '요트 및 항해 교육 프로그램 찾기',
+                onTap: () {
+                  // 교육 찾는 서비스 기능 구현
+                },
+              ),
               const SizedBox(height: 20),
             ],
           ),
