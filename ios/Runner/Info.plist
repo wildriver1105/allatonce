@@ -24,6 +24,12 @@
 	<string>This app requires microphone access for video recording.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app accesses your photo library to attach images to manual documents.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to your location to show nearby marinas and services on the map.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to your location to show nearby marinas and services on the map.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs access to your location to show nearby marinas and services on the map.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
