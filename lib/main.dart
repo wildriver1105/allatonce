@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/main_screen.dart';
 import 'constants/colors.dart';
+import 'screens/dummy_main.dart';
 
 void main() async {
   try {
@@ -27,7 +28,8 @@ class MyApp extends StatelessWidget {
           background: AppColors.background,
         ),
       ),
-      home: const MainScreen(),
+      // home: const MainScreen(),
+      home: const DummyMainScreen(),
     );
   }
 }
