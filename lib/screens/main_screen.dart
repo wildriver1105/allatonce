@@ -3,6 +3,7 @@ import '../constants/colors.dart';
 import 'home_screen.dart';
 import 'chat_screen.dart';
 import 'marina_service_screen.dart';
+import 'profile_screen.dart';
 // import 'settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -37,6 +38,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       ChatScreen(modelName: selectedModel),
       const MarinaServiceScreen(),
+      const ProfileScreen(),
       // const SettingsScreen(),
     ];
 
@@ -51,6 +53,7 @@ class _MainScreenState extends State<MainScreen> {
           }
         },
         selectedItemColor: AppColors.primary,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -64,10 +67,10 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.dock),
             label: '마리나',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.settings),
-          //   label: 'Settings',
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: '프로필',
+          ),
         ],
       ),
     );
