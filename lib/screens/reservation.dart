@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
-import 'schedule_selection_screen.dart';
+import '../widgets/schedule.dart';
 
-class BerthReservationScreen extends StatefulWidget {
-  const BerthReservationScreen({super.key});
+class ReservationScreen extends StatefulWidget {
+  const ReservationScreen({super.key});
 
   @override
-  State<BerthReservationScreen> createState() => _BerthReservationScreenState();
+  State<ReservationScreen> createState() => _ReservationScreenState();
 }
 
-class _BerthReservationScreenState extends State<BerthReservationScreen> {
+class _ReservationScreenState extends State<ReservationScreen> {
   String? selectedSchedule;
   String? boatInfo;
 

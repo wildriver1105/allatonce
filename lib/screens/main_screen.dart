@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import 'home_screen.dart';
 import 'chat_screen.dart';
-import 'marina_service_screen.dart';
+import 'marina_service.dart';
 import 'profile_screen.dart';
 // import 'settings_screen.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
-import 'berth_reservation_screen.dart';
+import 'reservation.dart';
 
 class MarinaServiceScreen extends StatefulWidget {
   const MarinaServiceScreen({super.key});
@@ -42,7 +42,7 @@ class _MarinaServiceScreenState extends State<MarinaServiceScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const BerthReservationScreen(),
+            builder: (context) => const ReservationScreen(),
           ),
         );
       },

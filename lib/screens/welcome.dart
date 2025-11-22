@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/colors.dart';
+import '../widgets/boat_registration.dart';
+import 'reservation.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -84,7 +85,12 @@ class WelcomeScreen extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // 선박 정보 등록 화면으로 이동
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const BoatRegistrationScreen(),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xff0088FF),
@@ -108,7 +114,12 @@ class WelcomeScreen extends StatelessWidget {
                     // 나중에 할게요 버튼
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ReservationScreen(),
+                          ),
+                        );
                       },
                       child: Text(
                         '나중에 할게요',
