@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../constants/colors.dart';
-import 'new_boat.dart';
+import 'welcome.dart';
 
 class DummyMainScreen extends StatelessWidget {
   const DummyMainScreen({super.key});
@@ -16,7 +16,7 @@ class DummyMainScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(flex: 2),
+              const SizedBox(height: 120),
               // 로고
               SizedBox(
                 width: 120,
@@ -27,25 +27,24 @@ class DummyMainScreen extends StatelessWidget {
                   height: 120,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 45),
               // "쉽고 빠른 예약" 텍스트
               Text(
                 '쉽고 빠른 예약',
                 style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.teal[400],
-                  fontWeight: FontWeight.w500,
+                  fontSize: 26,
+                  color: Color(0xff0088FF),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               // "BOATSPOT" 텍스트
               const Text(
                 'BOATSPOT',
                 style: TextStyle(
-                  fontSize: 36,
+                  fontSize: 40,
+                  color: Color(0xff0088FF),
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                  letterSpacing: 2,
                 ),
               ),
               const Spacer(flex: 3),
@@ -57,7 +56,7 @@ class DummyMainScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const NewBoatScreen(),
+                        builder: (context) => const WelcomeScreen(),
                       ),
                     );
                   },
