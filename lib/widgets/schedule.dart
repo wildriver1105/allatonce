@@ -161,6 +161,7 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
             if (_showTimePicker) _buildTimePicker(),
             // 입력 완료 버튼
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -191,7 +192,7 @@ class _ScheduleSelectionScreenState extends State<ScheduleSelectionScreen> {
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: Color(0xff0088FF),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

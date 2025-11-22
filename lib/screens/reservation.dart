@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import '../widgets/schedule.dart';
+import 'my_reservations.dart';
 
 class ReservationScreen extends StatefulWidget {
   const ReservationScreen({super.key});
@@ -68,16 +69,19 @@ class _ReservationScreenState extends State<ReservationScreen> {
               ElevatedButton(
                 onPressed: selectedSchedule != null && boatInfo != null
                     ? () {
-                        // 조회하기 기능 구현
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('예약 조회 중...'),
+                        // 내 예약 화면으로 이동
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyReservationsScreen(),
                           ),
                         );
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[400],
+                  backgroundColor: selectedSchedule != null && boatInfo != null
+                      ? const Color(0xff0088FF)
+                      : Colors.grey[300],
                   disabledBackgroundColor: Colors.grey[300],
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -144,46 +148,9 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey[300]!),
                 ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.map,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '마리나 지도',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // 비어있는 공간 표시 (초록색 영역)
-                    Positioned(
-                      right: 40,
-                      top: 60,
-                      child: Container(
-                        width: 120,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.green,
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                child: Image.asset(
+                  'assets/images/marina.png',
+                  fit: BoxFit.cover,
                 ),
               ),
             ],
@@ -196,8 +163,12 @@ class _ReservationScreenState extends State<ReservationScreen> {
         onTap: (index) {
           if (index == 1) {
             // 내 예약 화면으로 이동
-          } else if (index == 2) {
-            // 내 정보 화면으로 이동
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MyReservationsScreen(),
+              ),
+            );
           }
         },
         items: const [
@@ -208,10 +179,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmark),
             label: '내 예약',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '내 정보',
           ),
         ],
       ),
@@ -234,30 +201,44 @@ class _ReservationScreenState extends State<ReservationScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
-            Row(
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: value == '일정 선택' || value == '정보 입력'
-                        ? Colors.grey[600]
-                        : Colors.black87,
+            const SizedBox(width: 16), // 라벨과 값 사이 간격 추가
+            Expanded(
+              flex: 2,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: value == '일정 선택' || value == '정보 입력'
+                            ? Colors.grey[600]
+                            : Colors.black87,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      textAlign: TextAlign.right,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey[400],
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey[400],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
