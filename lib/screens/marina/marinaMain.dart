@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/colors.dart';
-import 'reservation.dart';
+import '../../constants/colors.dart';
+import '../reservation.dart';
 
 class MarinaServiceScreen extends StatefulWidget {
   const MarinaServiceScreen({super.key});

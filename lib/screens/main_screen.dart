@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
-import 'home_screen.dart';
+import 'home/home_screen.dart';
 import 'chat/chatroom.dart';
-import 'marina_service.dart';
-import 'profile_screen.dart';
+import 'marina/marina_service.dart';
+import 'profile/myProfile.dart';
 // import 'settings_screen.dart';
 
 class MainScreen extends StatefulWidget {

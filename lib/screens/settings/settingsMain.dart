@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../constants/colors.dart';
-import '../services/manual_service.dart';
-import '../models/manual_folder.dart';
-import '../widgets/create_folder_dialog.dart';
-import '../widgets/upload_manual_dialog.dart';
-import '../widgets/manual_list.dart';
+import '../../constants/colors.dart';
+import '../../services/manual_service.dart';
+import '../../models/manual_folder.dart';
+import '../../widgets/create_folder_dialog.dart';
+import '../../widgets/upload_manual_dialog.dart';
+import '../../widgets/manual_list.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
