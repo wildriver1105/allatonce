@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "867947510090",
+    "project_id": "hooaah-marine",
+    "storage_bucket": "hooaah-marine.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867947510090:android:03c05e256783888a55e9b3",
+        "android_client_info": {
+          "package_name": "com.example.allatonce"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBSyY_Tvu0B0FhiG_ZINbnHFkg88xUCpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

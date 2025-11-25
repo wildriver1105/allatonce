@@ -1,5 +1,1 @@
-{
-  "remoteconfig": {
-    "template": "remoteconfig.template.json"
-  }
-}
+{"remoteconfig":{"template":"remoteconfig.template.json"},"flutter":{"platforms":{"android":{"default":{"projectId":"hooaah-marine","appId":"1:867947510090:android:03c05e256783888a55e9b3","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"hooaah-marine","appId":"1:867947510090:ios:6ef127e46520b8a755e9b3","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"hooaah-marine","configurations":{"android":"1:867947510090:android:03c05e256783888a55e9b3","ios":"1:867947510090:ios:6ef127e46520b8a755e9b3"}}}}}}
