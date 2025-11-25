@@ -45,6 +45,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   gpt_markdown: ^1.1.2
   google_fonts: ^6.3.2
+  firebase_core: ^4.2.1
 
 dev_dependencies:
   flutter_test:
