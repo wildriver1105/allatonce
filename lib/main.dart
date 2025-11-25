@@ -5,7 +5,7 @@ import 'constants/colors.dart';
 import 'screens/dummy_main.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'services/remote_config_service.dart';
+import 'services/firebase/remote_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +28,7 @@ void main() async {
     
     print('Remote Config - Welcome Message: $welcomeMessage');
     print('Remote Config - App Version: $appVersion');
+    print('Remote Config - Dummy: $isDummy');
   } catch (e) {
     print('Warning: Could not load .env file or initialize Firebase: $e');
   }
@@ -41,16 +42,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AI Marine Care',
-      theme: ThemeData(
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: AppColors.background,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          background: AppColors.background,
-        ),
-      ),
-      // home: const MainScreen(),
       home: isDummy ? const DummyMainScreen() : const MainScreen(),
     );
   }
