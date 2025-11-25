@@ -46,6 +46,7 @@ dependencies:
   gpt_markdown: ^1.1.2
   google_fonts: ^6.3.2
   firebase_core: ^4.2.1
+  firebase_remote_config: ^6.1.2
 
 dev_dependencies:
   flutter_test:
