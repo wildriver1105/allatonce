@@ -63,14 +63,14 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.chat),
             label: 'Chat',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dock),
-            label: '마리나',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '프로필',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.dock),
+          //   label: '마리나',
+          // ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.person),
+          //   label: '프로필',
+          // ),
         ],
       ),
     );
