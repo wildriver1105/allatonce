@@ -1,7 +1,7 @@
+import 'package:allatonce/screens/chat/chatroomList.dart';
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
-import 'home/home_screen.dart';
-import 'chat/chatroom.dart';
+import 'home/home.dart';
 import 'marina/marinaMain.dart';
 import 'profile/myProfile.dart';
 // import 'settings_screen.dart';
@@ -36,7 +36,7 @@ class _MainScreenState extends State<MainScreen> {
         setScreen: setSelectedIndex,
         onModelSelected: setSelectedModel,
       ),
-      ChatScreen(modelName: selectedModel),
+      ChatroomListScreen(),
       const MarinaServiceScreen(),
       const ProfileScreen(),
       // const SettingsScreen(),
