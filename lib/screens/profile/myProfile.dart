@@ -116,6 +116,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
         ),
         _buildMenuTile(
+          icon: Icons.calendar_month,
+          title: '스케줄 관리',
+          onTap: () {
+            // 스케줄 관리 화면으로 이동
+          },
+        ),
+        _buildMenuTile(
           icon: Icons.history,
           title: '이용 내역',
           onTap: () {

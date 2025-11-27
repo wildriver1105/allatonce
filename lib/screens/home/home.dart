@@ -58,6 +58,51 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
+  final List<Map<String, dynamic>> _crewMembers = [
+    {
+      'name': '김스키퍼',
+      'badge': '스키퍼',
+      'isOnline': true,
+      'color': const Color(0xFF4A90D9),
+    },
+    {
+      'name': '박세일러',
+      'badge': '크루',
+      'isOnline': true,
+      'color': const Color(0xFF50C878),
+    },
+    {
+      'name': '이항해',
+      'badge': '베테랑',
+      'isOnline': false,
+      'color': const Color(0xFFFF6B6B),
+    },
+    {
+      'name': '최바다',
+      'badge': '초보',
+      'isOnline': true,
+      'color': const Color(0xFFFFB347),
+    },
+    {
+      'name': '정요트',
+      'badge': '스키퍼',
+      'isOnline': false,
+      'color': const Color(0xFF9B59B6),
+    },
+    {
+      'name': '한마린',
+      'badge': '크루',
+      'isOnline': true,
+      'color': const Color(0xFF1ABC9C),
+    },
+    {
+      'name': '강세일',
+      'badge': '베테랑',
+      'isOnline': true,
+      'color': const Color(0xFFE74C3C),
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +124,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
+                    // 크루 찾기
+                    _buildSectionTitle('크루 찾기', onTap: () {}),
+                    const SizedBox(height: 12),
+                    _buildCrewList(),
+                    const SizedBox(height: 24),
                     // 최근 검색 카드
                     _buildContinueSearchingCard(),
                     const SizedBox(height: 28),
@@ -324,6 +374,117 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 4),
             const Icon(Icons.chevron_right, size: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCrewList() {
+    return SizedBox(
+      height: 110,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _crewMembers.length,
+        itemBuilder: (context, index) {
+          final crew = _crewMembers[index];
+          return _buildCrewAvatar(crew);
+        },
+      ),
+    );
+  }
+
+  Widget _buildCrewAvatar(Map<String, dynamic> crew) {
+    return GestureDetector(
+      onTap: () {
+        // 크루 프로필로 이동
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${crew['name']} 프로필 보기')),
+        );
+      },
+      child: Container(
+        width: 80,
+        margin: const EdgeInsets.symmetric(horizontal: 6),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                // 프로필 이미지 테두리 (그라데이션)
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        crew['color'] as Color,
+                        (crew['color'] as Color).withOpacity(0.5),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.grey[200],
+                      child: Icon(
+                        Icons.person,
+                        size: 32,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ),
+                ),
+                // 온라인 상태 표시
+                if (crew['isOnline'] == true)
+                  Positioned(
+                    bottom: 2,
+                    right: 2,
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              crew['name'] as String,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 2),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: (crew['color'] as Color).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                crew['badge'] as String,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: crew['color'] as Color,
+                ),
+              ),
+            ),
           ],
         ),
       ),
