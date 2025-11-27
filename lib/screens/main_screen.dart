@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import 'home/home.dart';
 import 'marina/marinaMain.dart';
+import 'community/community_main.dart';
 import 'profile/myProfile.dart';
 // import 'settings_screen.dart';
 
@@ -36,8 +37,9 @@ class _MainScreenState extends State<MainScreen> {
         setScreen: setSelectedIndex,
         onModelSelected: setSelectedModel,
       ),
-      ChatroomListScreen(),
       const MarinaServiceScreen(),
+      const CommunityScreen(),
+      ChatroomListScreen(),
       const ProfileScreen(),
       // const SettingsScreen(),
     ];
@@ -60,12 +62,16 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.dock),
             label: '마리나',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.forum),
+            label: '커뮤니티',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Chat',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
