@@ -8,6 +8,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  // 보트 소유 여부 (실제로는 서버에서 가져옴)
+  bool _hasBoat = false;
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,8 +29,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // 기능 카드들 (지난 항해, 커넥션)
               _buildFeatureCards(),
               const SizedBox(height: 16),
-              // 스키퍼 되기 카드
-              _buildBecomeSkipperCard(),
+              // 나의 보트 등록 카드
+              _buildMyBoatCard(),
               const SizedBox(height: 24),
               // 메뉴 리스트
               _buildMenuList(),
@@ -135,6 +138,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // 보트 소유 여부 배지
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _hasBoat 
+                        ? const Color(0xFF008489).withOpacity(0.1)
+                        : Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _hasBoat 
+                          ? const Color(0xFF008489)
+                          : Colors.grey[400]!,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _hasBoat ? Icons.directions_boat : Icons.person,
+                        size: 14,
+                        color: _hasBoat 
+                            ? const Color(0xFF008489)
+                            : Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _hasBoat ? '보트 오너' : '크루 멤버',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _hasBoat 
+                              ? const Color(0xFF008489)
+                              : Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -265,61 +307,114 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildBecomeSkipperCard() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
+  Widget _buildMyBoatCard() {
+    return GestureDetector(
+      onTap: () {
+        // 보트 등록/관리 화면으로 이동
+        if (_hasBoat) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('내 보트 관리 화면으로 이동')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('보트 등록 화면으로 이동')),
+          );
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _hasBoat 
+              ? const Color(0xFF008489).withOpacity(0.05)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: _hasBoat 
+              ? Border.all(color: const Color(0xFF008489).withOpacity(0.3))
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-            child: const Icon(
-              Icons.sailing,
-              size: 32,
-              color: Color(0xFFE91E63),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: _hasBoat 
+                    ? const Color(0xFF008489).withOpacity(0.15)
+                    : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.directions_boat,
+                size: 32,
+                color: _hasBoat 
+                    ? const Color(0xFF008489)
+                    : const Color(0xFF008489),
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '스키퍼 되기',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        _hasBoat ? '나의 보트' : '나의 보트 등록',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (_hasBoat) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF008489),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            '등록됨',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '경험을 공유하고 수익을 창출하세요.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
+                  const SizedBox(height: 4),
+                  Text(
+                    _hasBoat 
+                        ? '보트 정보를 관리하고 크루를 모집하세요.'
+                        : '보트를 등록하고 크루를 모집해보세요.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Icon(Icons.chevron_right, color: Colors.grey[400]),
-        ],
+            Icon(
+              _hasBoat ? Icons.edit : Icons.add_circle_outline,
+              color: const Color(0xFF008489),
+            ),
+          ],
+        ),
       ),
     );
   }
