@@ -2,10 +2,9 @@ import 'package:allatonce/screens/chat/chatroomList.dart';
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import 'home/home.dart';
-import 'marina/marinaMain.dart';
+import 'voyage/voyage_main.dart';
 import 'community/community_main.dart';
 import 'profile/myProfile.dart';
-// import 'settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -37,11 +36,10 @@ class _MainScreenState extends State<MainScreen> {
         setScreen: setSelectedIndex,
         onModelSelected: setSelectedModel,
       ),
-      const MarinaServiceScreen(),
+      const VoyageScreen(),
       const CommunityScreen(),
       ChatroomListScreen(),
       const ProfileScreen(),
-      // const SettingsScreen(),
     ];
 
     return Scaffold(
@@ -49,7 +47,6 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: (index) {
-          // Settings 탭이 비활성화되어 있으므로 인덱스 2는 무시
           if (index < screens.length) {
             setSelectedIndex(index);
           }
@@ -62,8 +59,8 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dock),
-            label: '마리나',
+            icon: Icon(Icons.explore),
+            label: 'Voyage',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.forum),

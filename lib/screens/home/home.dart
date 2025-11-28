@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../marina/marinaDetail.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(int)? setScreen;
@@ -23,39 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
     {'icon': Icons.build_circle, 'label': '서비스', 'isNew': true},
     {'icon': Icons.school, 'label': '교육', 'isNew': false},
     {'icon': Icons.event, 'label': '이벤트', 'isNew': false},
-  ];
-
-  final List<Map<String, dynamic>> _recentlyViewed = [
-    {
-      'image': 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=400',
-      'location': '제주 마리나',
-      'details': '요트 3대 · ★ 4.78',
-    },
-    {
-      'image': 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=400',
-      'location': '부산 마리나',
-      'details': '요트 5대 · ★ 4.82',
-    },
-    {
-      'image': 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=400',
-      'location': '여수 마리나',
-      'details': '요트 4대',
-    },
-  ];
-
-  final List<Map<String, dynamic>> _recommended = [
-    {
-      'image': 'https://images.unsplash.com/photo-1559190394-df5a28aab5c5?w=400',
-      'title': 'FarEast 28 체험',
-      'subtitle': '입문자를 위한 세일링',
-      'isGuestFavorite': true,
-    },
-    {
-      'image': 'https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=400',
-      'title': '선상 파티',
-      'subtitle': '프리미엄 요트 파티',
-      'isGuestFavorite': true,
-    },
   ];
 
   final List<Map<String, dynamic>> _crewMembers = [
@@ -95,11 +63,66 @@ class _HomeScreenState extends State<HomeScreen> {
       'isOnline': true,
       'color': const Color(0xFF1ABC9C),
     },
+  ];
+
+  final List<Map<String, dynamic>> _nearbyMarinas = [
     {
-      'name': '강세일',
-      'badge': '베테랑',
-      'isOnline': true,
-      'color': const Color(0xFFE74C3C),
+      'name': '제주 중문 마리나',
+      'location': '제주시 중문동',
+      'rating': 4.9,
+      'reviews': 128,
+      'distance': '2.3km',
+      'available': true,
+    },
+    {
+      'name': '부산 수영만 요트경기장',
+      'location': '부산시 해운대구',
+      'rating': 4.8,
+      'reviews': 342,
+      'distance': '15.2km',
+      'available': true,
+    },
+    {
+      'name': '인천 영종도 마리나',
+      'location': '인천시 중구',
+      'rating': 4.7,
+      'reviews': 256,
+      'distance': '28.5km',
+      'available': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _popularMarinas = [
+    {
+      'name': '여수 엑스포 마리나',
+      'location': '여수시',
+      'rating': 4.9,
+      'reviews': 198,
+    },
+    {
+      'name': '통영 마리나',
+      'location': '통영시',
+      'rating': 4.8,
+      'reviews': 156,
+    },
+    {
+      'name': '거제 마리나',
+      'location': '거제시',
+      'rating': 4.7,
+      'reviews': 89,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _recommended = [
+    {
+      'title': 'FarEast 28 체험',
+      'subtitle': '입문자를 위한 세일링',
+      'isGuestFavorite': true,
+    },
+    {
+      'title': '선상 파티',
+      'subtitle': '프리미엄 요트 파티',
+      'isGuestFavorite': true,
     },
   ];
 
@@ -128,17 +151,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     _buildSectionTitle('크루 찾기', onTap: () {}),
                     const SizedBox(height: 12),
                     _buildCrewList(),
-                    const SizedBox(height: 24),
-                    // 최근 검색 카드
-                    _buildContinueSearchingCard(),
                     const SizedBox(height: 28),
-                    // 최근 본 항목
-                    _buildSectionTitle('최근 본 항목', onTap: () {}),
+                    // 근처 마리나
+                    _buildSectionTitle('📍 근처 마리나', onTap: () {}),
                     const SizedBox(height: 12),
-                    _buildRecentlyViewedList(),
+                    _buildNearbyMarinasList(),
                     const SizedBox(height: 28),
-                    // 추천 항목
-                    _buildSectionTitle('인기 체험', onTap: () {}),
+                    // 인기 마리나
+                    _buildSectionTitle('⭐ 인기 마리나', onTap: () {}),
+                    const SizedBox(height: 12),
+                    _buildPopularMarinasList(),
+                    const SizedBox(height: 28),
+                    // 추천 체험
+                    _buildSectionTitle('🎯 추천 체험', onTap: () {}),
                     const SizedBox(height: 12),
                     _buildRecommendedList(),
                     const SizedBox(height: 40),
@@ -202,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, index) {
           final category = _categories[index];
           final isSelected = _selectedCategoryIndex == index;
-          
+
           return GestureDetector(
             onTap: () {
               setState(() {
@@ -271,93 +296,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildContinueSearchingCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: GestureDetector(
-        onTap: () {
-          // 검색 계속하기
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[200]!),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '제주 마리나 근처\n요트 체험 검색 계속하기',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text(
-                          '12월 9-12일',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Text(
-                          ' · ',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                        Text(
-                          '3명',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Icon(
-                          Icons.chevron_right,
-                          size: 18,
-                          color: Colors.grey[600],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 100,
-                  height: 80,
-                  color: Colors.grey[200],
-                  child: Icon(
-                    Icons.sailing,
-                    size: 40,
-                    color: Colors.grey[400],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildSectionTitle(String title, {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -398,7 +336,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCrewAvatar(Map<String, dynamic> crew) {
     return GestureDetector(
       onTap: () {
-        // 크루 프로필로 이동
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${crew['name']} 프로필 보기')),
         );
@@ -410,7 +347,6 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Stack(
               children: [
-                // 프로필 이미지 테두리 (그라데이션)
                 Container(
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
@@ -441,7 +377,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                // 온라인 상태 표시
                 if (crew['isOnline'] == true)
                   Positioned(
                     bottom: 2,
@@ -491,25 +426,292 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRecentlyViewedList() {
+  Widget _buildNearbyMarinasList() {
     return SizedBox(
-      height: 200,
+      height: 180,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _recentlyViewed.length,
+        itemCount: _nearbyMarinas.length,
         itemBuilder: (context, index) {
-          final item = _recentlyViewed[index];
-          return _buildRecentlyViewedCard(item);
+          final marina = _nearbyMarinas[index];
+          return _buildNearbyMarinaCard(marina);
         },
       ),
     );
   }
 
-  Widget _buildRecentlyViewedCard(Map<String, dynamic> item) {
+  Widget _buildNearbyMarinaCard(Map<String, dynamic> marina) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MarinaDetailScreen(
+              marinaName: marina['name'] as String,
+              location: marina['location'] as String,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 280,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 90,
+              decoration: BoxDecoration(
+                color: const Color(0xFF008489).withOpacity(0.8),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(
+                      Icons.sailing,
+                      size: 40,
+                      color: Colors.white.withOpacity(0.5),
+                    ),
+                  ),
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        marina['distance'] as String,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (marina['available'] == true)
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4CAF50),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          '예약가능',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    marina['name'] as String,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, size: 14, color: Colors.grey[500]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          marina['location'] as String,
+                          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const Icon(Icons.star, size: 14, color: Color(0xFFFFB800)),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${marina['rating']}',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopularMarinasList() {
+    return SizedBox(
+      height: 180,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _popularMarinas.length,
+        itemBuilder: (context, index) {
+          final marina = _popularMarinas[index];
+          return _buildPopularMarinaCard(marina);
+        },
+      ),
+    );
+  }
+
+  Widget _buildPopularMarinaCard(Map<String, dynamic> marina) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MarinaDetailScreen(
+              marinaName: marina['name'] as String,
+              location: marina['location'] as String,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF008489),
+                    const Color(0xFF008489).withOpacity(0.7),
+                  ],
+                ),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(
+                      Icons.sailing,
+                      size: 40,
+                      color: Colors.white.withOpacity(0.4),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.favorite_border,
+                        size: 16,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    marina['name'] as String,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, size: 12, color: Color(0xFFFFB800)),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${marina['rating']}',
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        ' (${marina['reviews']})',
+                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecommendedList() {
+    return SizedBox(
+      height: 220,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _recommended.length,
+        itemBuilder: (context, index) {
+          final item = _recommended[index];
+          return _buildRecommendedCard(item);
+        },
+      ),
+    );
+  }
+
+  Widget _buildRecommendedCard(Map<String, dynamic> item) {
     return Container(
-      width: 160,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      width: 200,
+      margin: const EdgeInsets.only(right: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -518,19 +720,41 @@ class _HomeScreenState extends State<HomeScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  height: 120,
-                  width: 160,
+                  height: 150,
+                  width: 200,
                   color: Colors.grey[200],
                   child: Icon(
                     Icons.sailing,
-                    size: 48,
+                    size: 56,
                     color: Colors.grey[400],
                   ),
                 ),
               ),
+              if (item['isGuestFavorite'] == true)
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      '인기 체험',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
               Positioned(
-                top: 8,
-                right: 8,
+                top: 10,
+                right: 10,
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
@@ -546,131 +770,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            item['location'] as String,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            item['details'] as String,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[600],
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecommendedList() {
-    return SizedBox(
-      height: 260,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _recommended.length,
-        itemBuilder: (context, index) {
-          final item = _recommended[index];
-          return _buildRecommendedCard(item);
-        },
-      ),
-    );
-  }
-
-  Widget _buildRecommendedCard(Map<String, dynamic> item) {
-    return Container(
-      width: 220,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  height: 180,
-                  width: 220,
-                  color: Colors.grey[200],
-                  child: Icon(
-                    Icons.sailing,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                ),
-              ),
-              if (item['isGuestFavorite'] == true)
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: const Text(
-                      '인기 체험',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.favorite_border,
-                    size: 20,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 10),
           Text(
             item['title'] as String,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Text(
             item['subtitle'] as String,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
