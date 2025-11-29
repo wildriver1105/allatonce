@@ -128,6 +128,20 @@ class _CommunityScreenState extends State<CommunityScreen>
     }).toList();
   }
 
+  Future<void> _onRefresh() async {
+    // 실제로는 여기서 API 호출하여 데이터 새로고침
+    await Future.delayed(const Duration(seconds: 1));
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('새로고침 완료'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,12 +153,17 @@ class _CommunityScreenState extends State<CommunityScreen>
           Expanded(
             child: _filteredPosts.isEmpty
                 ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.only(top: 8),
-                    itemCount: _filteredPosts.length,
-                    itemBuilder: (context, index) {
-                      return _buildPostCard(_filteredPosts[index]);
-                    },
+                : RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    color: const Color(0xFF008489),
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: _filteredPosts.length,
+                      itemBuilder: (context, index) {
+                        return _buildPostCard(_filteredPosts[index]);
+                      },
+                    ),
                   ),
           ),
         ],
