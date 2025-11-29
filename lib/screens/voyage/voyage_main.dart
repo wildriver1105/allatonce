@@ -10,6 +10,11 @@ class VoyageScreen extends StatefulWidget {
 class _VoyageScreenState extends State<VoyageScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
+  double _statsOpacity = 1.0;
+  double _statsHeight = 120.0;
+  static const double _maxStatsHeight = 120.0;
+  static const double _minStatsHeight = 0.0;
 
   final List<Map<String, dynamic>> _upcomingVoyages = [
     {
@@ -92,7 +97,29 @@ class _VoyageScreenState extends State<VoyageScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  bool _onScroll(ScrollNotification notification) {
+    // Only respond to vertical scrolls (not horizontal tab navigation)
+    if (notification.metrics.axis != Axis.vertical) {
+      return false;
+    }
+    
+    if (notification is ScrollUpdateNotification) {
+      final offset = notification.metrics.pixels;
+      final newHeight = (_maxStatsHeight - offset).clamp(_minStatsHeight, _maxStatsHeight);
+      final newOpacity = (newHeight / _maxStatsHeight).clamp(0.0, 1.0);
+      
+      if (newHeight != _statsHeight || newOpacity != _statsOpacity) {
+        setState(() {
+          _statsHeight = newHeight;
+          _statsOpacity = newOpacity;
+        });
+      }
+    }
+    return false;
   }
 
   @override
@@ -103,30 +130,43 @@ class _VoyageScreenState extends State<VoyageScreen>
         child: Column(
           children: [
             _buildHeader(),
-            _buildQuickStats(),
+            // Collapsible stats section
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 50),
+              height: _statsHeight,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 50),
+                opacity: _statsOpacity,
+                child: _buildQuickStats(),
+              ),
+            ),
             _buildTabBar(),
+            const SizedBox(height: 8),
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildUpcomingTab(),
-                  _buildHistoryTab(),
-                  _buildLiveTrafficTab(),
-                ],
+              child: NotificationListener<ScrollNotification>(
+                onNotification: _onScroll,
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildUpcomingTab(),
+                    _buildHistoryTab(),
+                    _buildLiveTrafficTab(),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showCreateVoyageSheet();
         },
         backgroundColor: const Color(0xFF008489),
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          '새 항해 계획',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        child: const Icon(
+          Icons.edit_location_alt,
+          color: Colors.white,
+          size: 26,
         ),
       ),
     );
@@ -172,20 +212,20 @@ class _VoyageScreenState extends State<VoyageScreen>
 
   Widget _buildQuickStats() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF008489), Color(0xFF00A693)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF008489).withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -194,9 +234,9 @@ class _VoyageScreenState extends State<VoyageScreen>
         children: [
           _buildStatItem('12', '총 항해', Icons.sailing),
           _buildStatDivider(),
-          _buildStatItem('856', '총 거리(km)', Icons.straighten),
+          _buildStatItem('856', '거리(km)', Icons.straighten),
           _buildStatDivider(),
-          _buildStatItem('48', '항해 시간', Icons.access_time),
+          _buildStatItem('48h', '시간', Icons.access_time),
         ],
       ),
     );
@@ -204,23 +244,23 @@ class _VoyageScreenState extends State<VoyageScreen>
 
   Widget _buildStatItem(String value, String label, IconData icon) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white.withOpacity(0.8), size: 24),
-        const SizedBox(height: 8),
+        Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+        const SizedBox(height: 4),
         Text(
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
         Text(
           label,
           style: TextStyle(
             color: Colors.white.withOpacity(0.8),
-            fontSize: 12,
+            fontSize: 11,
           ),
         ),
       ],
@@ -229,7 +269,7 @@ class _VoyageScreenState extends State<VoyageScreen>
 
   Widget _buildStatDivider() {
     return Container(
-      height: 50,
+      height: 40,
       width: 1,
       color: Colors.white.withOpacity(0.3),
     );
@@ -809,4 +849,3 @@ class _VoyageScreenState extends State<VoyageScreen>
     );
   }
 }
-
